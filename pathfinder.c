@@ -1,44 +1,45 @@
-/* 
+
 #include "solong.h"
 
 
-void	fill(char **valid_map, t_map *s_map, char change)
+typedef struct s_path
 {
-	if(s_map->y < 0 || s_map->y >= s_map->rows || s_map->x < 0 || s_map->x >= s_map->line_length || (valid_map[s_map->y][s_map->x] != change && valid_map[s_map->y][s_map->x] != 'C' && valid_map[s_map->y][s_map->x] != 'E'))
+	int x;
+	int y;
+}	t_path;
+
+
+void	flood_fill(char **map, t_map maze, t_path path, int *counter)
+{
+	if(path.y < 0 || path.y >= maze.m_height || path.x < 0 || path.x >= maze.m_length || (map[path.y][path.x] != '0' && map[path.y][path.x] != 'C' && map[path.y][path.x] != 'E' && map[path.y][path.x] != 'P'))
 	{
 		return;
 	}
-	if(valid_map[s_map->y][s_map->x] == 'C')
+	if(map[path.y][path.x] == 'C' || map[path.y][path.x] == 'E')
 	{
-		*s_map->counter += 1;
-		printf("\ncollectable found\n");
+		(*counter)++;
 	}
-	if (s_map->counter > 0 && valid_map[s_map->y][s_map->x] == 'E')
+	map[path.y][path.x] = '.';
+	flood_fill(map, maze, (t_path){path.x - 1, path.y}, counter);
+	flood_fill(map, maze, (t_path){path.x + 1, path.y}, counter);
+	flood_fill(map, maze, (t_path){path.x, path.y - 1}, counter);
+	flood_fill(map, maze, (t_path){path.x, path.y + 1}, counter);
+}
+
+
+int		pathfinder(t_map any_struct)
+{
+	t_path s_path;
+	s_path.x = any_struct.x_pos;
+	s_path.y = any_struct.y_pos;
+	int cnt;
+
+	cnt = 0;
+	flood_fill(any_struct.map, any_struct, s_path, &cnt);
+
+	if(cnt != (any_struct.e_cnt + any_struct.c_cnt))
 	{
-		printf("\nvalid\n");
+		printf("\nnot playable \n");
 	}
-	valid_map[s_map->y][s_map->x] = 'x';
-	fill(valid_map, &(t_map){s_map->x - 1, s_map->y, s_map->counter}, change);
-	fill(valid_map, &(t_map){s_map->x + 1, s_map->y, s_map->counter}, change);
-	fill(valid_map, &(t_map){s_map->x, s_map->y - 1, s_map->counter}, change);
-	fill(valid_map, &(t_map){s_map->x, s_map->y + 1, s_map->counter}, change);
+	return(cnt);
 }
-
-
-void	flood(char **valid_map, t_map *s_map)
-{
-	printf("\nXX: %d\n", map.y);
-	//fill(valid_map, s_map, '0');
-}
-
-
-void	pathfinder(t_map *s_map)
-{
-	s_map.x = s_map->x_player_pos;
-	s_map.y = s_map->y_player_pos;
-
-	printf("\nXX: %d\n", map.y);
-	flood(s_map, s_map->c_cnt);
-
-}
- */
